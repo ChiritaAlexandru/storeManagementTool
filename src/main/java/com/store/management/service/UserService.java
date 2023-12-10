@@ -26,7 +26,7 @@ public class UserService {
             return new ResponseEntity<>("Successfully user added", HttpStatus.CREATED);
         } else {
             log.error(String.format("Error adding a new product. User name %s .", newUser.getName()));
-            throw new ResourceNotFoundException(String.format("User"));
+            throw new ResourceNotFoundException("User");
         }
     }
 

@@ -38,7 +38,7 @@ public class OrderService {
             return new ResponseEntity<>("Successfully order added.", HttpStatus.CREATED);
         } else {
             log.error(String.format("Error adding a new newOrder. Order details %s", newOrder));
-            throw new ResourceNotFoundException(String.format("Order"));
+            throw new ResourceNotFoundException("Order");
         }
     }
 
