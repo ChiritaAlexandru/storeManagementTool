@@ -26,19 +26,19 @@ public class OrderService {
 
     private final ProductService productService;
 
-    public ResponseEntity<?> addNewOrder(Order order, long userId) throws ResourceNotFoundException {
+    public ResponseEntity<?> addNewOrder(Order newOrder, long userId) throws ResourceNotFoundException {
         var user = userService.getUserById(userId);
-        order.setUser(user);
-        if (order.getProducts() != null && order.getProducts().size() > 0) {
-            order.setProducts(this.mappedProductsToOrder(order));
+        newOrder.setUser(user);
+        if (newOrder.getProducts() != null && newOrder.getProducts().size() > 0) {
+            newOrder.setProducts(this.mappedProductsToOrder(newOrder));
         }
-        var orderId = orderRepository.save(order).getIdOrder();
-        if (orderId != null) {
-            log.info(String.format("Order %d  was created with success", orderId));
-            return new ResponseEntity<>("Successfully order added", HttpStatus.CREATED);
+        var order = orderRepository.save(newOrder);
+        if (order != null && order.getIdOrder() != null) {
+            log.info(String.format("Order %d  was created with success", order.getIdOrder()));
+            return new ResponseEntity<>("Successfully order added.", HttpStatus.CREATED);
         } else {
-            log.error(String.format("Error adding a new order. Order details %s", order));
-            throw new ResourceNotFoundException("Order");
+            log.error(String.format("Error adding a new newOrder. Order details %s", newOrder));
+            throw new ResourceNotFoundException(String.format("Order"));
         }
     }
 
@@ -78,9 +78,10 @@ public class OrderService {
             orderRepository.delete(order.get());
             log.info(String.format("Order deleted successfully. Order id %d", orderId));
             return new ResponseEntity<>("Order deleted successfully", HttpStatus.OK);
-        } else
+        } else {
             log.error(String.format("Failed to delete order with id %d", orderId));
-        return new ResponseEntity<>("Order not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Order not found", HttpStatus.NOT_FOUND);
+        }
 
     }
 
@@ -111,10 +112,10 @@ public class OrderService {
                     log.info(String.format("Update stock product %d with new quantity %d", product.getIdProduct(), newQuantity));
                     product.setQuantity(prod.getQuantity());
                     orderProducts.add(product);
-                } else
+                } else {
                     log.error("There is a problem with product stock");
-                throw new IllegalArgumentException("product stock");
-
+                    throw new IllegalArgumentException("product stock");
+                }
 
             } catch (ResourceNotFoundException e) {
                 log.error(String.format("Failed to retrieve product %s", e.getMessage()));

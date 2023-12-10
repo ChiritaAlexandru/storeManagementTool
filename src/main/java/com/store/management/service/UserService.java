@@ -19,14 +19,14 @@ import static java.lang.String.format;
 public class UserService {
     private final UserRepository userRepository;
 
-    public ResponseEntity<?> addNewUser(User user) throws ResourceNotFoundException {
-        Long userId = userRepository.save(user).getIdUser();
-        if (userId != null) {
-            log.info(format("User added successfully %d with name %s", userId, user.getName()));
+    public ResponseEntity<?> addNewUser(User newUser) throws ResourceNotFoundException {
+        var user = userRepository.save(newUser);
+        if (user != null && user.getIdUser() != null) {
+            log.info(String.format("User added successfully %d with name %s", user.getIdUser(),newUser.getName() ));
             return new ResponseEntity<>("Successfully user added", HttpStatus.CREATED);
         } else {
-            log.error(format("Error adding a new product. User name %s .", user.getName()));
-            throw new ResourceNotFoundException("User");
+            log.error(String.format("Error adding a new product. User name %s .", newUser.getName()));
+            throw new ResourceNotFoundException(String.format("User"));
         }
     }
 
