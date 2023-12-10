@@ -6,11 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "order_store")
@@ -26,4 +30,10 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "id_user", referencedColumnName = "idUser")
     private User user;
+
+    @ManyToMany
+    @JoinTable(name = "order_product",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id"))
+    private Set<Product> products = new HashSet<>();
 }
