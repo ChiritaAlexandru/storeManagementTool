@@ -1,0 +1,1 @@
+CREATE TYPE userType AS ENUM ('CLIENT', 'ADMIN');
