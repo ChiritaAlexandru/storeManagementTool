@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,9 +21,11 @@ public class UserService {
     private final UserRepository userRepository;
 
     public ResponseEntity<?> addNewUser(User newUser) throws ResourceNotFoundException {
+        var encodedPassword = this.encodedPassword(newUser.getPassword());
+        newUser.setPassword(encodedPassword);
         var user = userRepository.save(newUser);
         if (user != null && user.getIdUser() != null) {
-            log.info(String.format("User added successfully %d with name %s", user.getIdUser(),newUser.getName() ));
+            log.info(String.format("User added successfully %d with name %s", user.getIdUser(), newUser.getName()));
             return new ResponseEntity<>("Successfully user added", HttpStatus.CREATED);
         } else {
             log.error(String.format("Error adding a new product. User name %s .", newUser.getName()));
@@ -68,10 +71,18 @@ public class UserService {
         var newUser = new User();
         newUser.setIdUser(userId);
         newUser.setName(user.getName());
-        newUser.setPassword(user.getPassword());
+        var passwordEncoded = this.encodedPassword(user.getPassword());
+        newUser.setPassword(passwordEncoded);
         newUser.setEmail(user.getEmail());
         newUser.setUserType(user.getUserType());
         return newUser;
+    }
+
+    private String encodedPassword(String password) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(password);
+        log.info(String.format("Encoded Password %s ", encodedPassword));
+        return encodedPassword;
     }
 
 

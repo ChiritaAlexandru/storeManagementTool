@@ -11,8 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -33,6 +35,7 @@ public class UserServiceTest {
         var user = new User();
         user.setIdUser(1L);
         user.setName("user");
+        user.setPassword("1234");
 
         var expectedResult = ResponseEntity.ok("Successfully user added");
 
@@ -40,16 +43,20 @@ public class UserServiceTest {
 
         var actualResult = userService.addNewUser(user);
 
-        Assertions.assertEquals(expectedResult.getBody(), actualResult.getBody());
+        assertEquals(expectedResult.getBody(), actualResult.getBody());
 
         verify(userRepository).save(any());
     }
 
     @Test
     void testAddUser_NotFound() {
-        when(userRepository.save(any())).thenReturn(null);
+        var user = new User();
+        user.setIdUser(1L);
+        user.setName("user");
+        user.setPassword("1234");
+        when(userRepository.save(user)).thenReturn(null);
 
-        assertThrows(ResourceNotFoundException.class, () -> userService.addNewUser(new User()));
+        assertThrows(ResourceNotFoundException.class, () -> userService.addNewUser(user));
 
         verify(userRepository).save(any());
     }
@@ -59,14 +66,15 @@ public class UserServiceTest {
         var user = new User();
         user.setIdUser(1L);
         user.setName("user");
+        user.setPassword("1234");
 
         var expectedResult = ResponseEntity.ok(user);
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(userRepository.save(any())).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
 
-        var actualResult = userService.updateUser(user, 1L);
-        Assertions.assertEquals(expectedResult.getBody(), actualResult.getBody());
+        ResponseEntity<User> actualResult = (ResponseEntity<User>) userService.updateUser(user, 1L);
+        assertEquals(Objects.requireNonNull(expectedResult.getBody()).getIdUser(), Objects.requireNonNull(actualResult.getBody()).getIdUser());
 
         verify(userRepository).findById(anyLong());
         verify(userRepository).save(any());
@@ -91,7 +99,7 @@ public class UserServiceTest {
 
         var actualResult = userService.getUserById(anyLong());
 
-        Assertions.assertEquals(expectedUser.getIdUser(), actualResult.getIdUser());
+        assertEquals(expectedUser.getIdUser(), actualResult.getIdUser());
 
         verify(userRepository).findById(anyLong());
     }
@@ -114,7 +122,7 @@ public class UserServiceTest {
         when(userRepository.findAll()).thenReturn(expectedResult);
         var actualResult = userService.getUsers();
 
-        Assertions.assertEquals(expectedResult, actualResult);
+        assertEquals(expectedResult, actualResult);
 
         verify(userRepository).findAll();
     }
@@ -130,8 +138,8 @@ public class UserServiceTest {
 
         var actualResult = userService.deleteUserById(anyLong());
 
-        Assertions.assertEquals(expectedResult.getBody(), actualResult.getBody());
-        Assertions.assertEquals(expectedResult.getStatusCode().value(), actualResult.getStatusCode().value());
+        assertEquals(expectedResult.getBody(), actualResult.getBody());
+        assertEquals(expectedResult.getStatusCode().value(), actualResult.getStatusCode().value());
 
         verify(userRepository).findById(anyLong());
         verify(userRepository).delete(any());
@@ -147,7 +155,7 @@ public class UserServiceTest {
         var actualResult = userService.deleteUserById(anyLong());
 
 
-        Assertions.assertEquals(expectedResult.getBody(), actualResult.getBody());
+        assertEquals(expectedResult.getBody(), actualResult.getBody());
 
 
     }

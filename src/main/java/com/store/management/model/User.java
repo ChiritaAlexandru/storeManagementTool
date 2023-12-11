@@ -25,6 +25,7 @@ public class User {
     private Long idUser;
     private String name;
     private String password;
+    @Column(unique = true)
     private String email;
     @Column(name = "user_type")
     @Enumerated(EnumType.STRING)
