@@ -10,7 +10,7 @@
         - Flyway is an open-source database migration tool,
             used for process of versioning and managing database schema changes
         - Swagger is an open-source standard for describing and documenting RESTful APIs
-        - Spring Security authentification with basic roles Admin and Client
+        - Spring Security authentication with basic roles Admin and Client
 
     Describe and document RESTful APIs
     
